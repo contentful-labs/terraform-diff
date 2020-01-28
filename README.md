@@ -1,11 +1,6 @@
-# Terraform-config-deps
+# Terraform-diff
 
-Terraform-config-deps is a thin wrapper around [terraform-config-inspect](https://github.com/hashicorp/terraform-config-inspect)
-to help compute, for each folder passed as argument, a list of folders where changes might trigger a plan for
-said folder.
-
-Given a git diff in a Terraform repository, this will help compute a list of folders where a Terraform plan & apply
-need to be run.
+Terraform-diff helps you detect what Terraform projects have changed when changes are made to Terraform modules.
 
 ## Example
 
@@ -35,23 +30,26 @@ The logic would be:
  * if there is a change in modules/module1/, modules/module2/, or project1/, you would want to run `make plan` in project1/.
  * if there is a change in modules/module3/, or project2/, you would want to run `make plan` in project2/
 
-``terraform-config-deps`` can help identify what folders/modules a terraform project depends on:
+This is where Terraform-diff is useful:
 
 ```
-$ terraform-config-deps project1 project2
-
+$ terraform-diff -h
+Usage of terraform-diff:
+  -output string
+      output format (text or json) (default "text")
+  -range string
+      git commit range
+$ terraform-diff project1 project2
+project1
+$ terraform-diff --range fbf666c786...ca37f7145f -o json project1 project2
 {
-  "project1": [
-    "project1",
-    "modules/module1",
-    "modules/module2"
- ], 
-  "project2": [
-    "project2",
-    "modules/module3",
- ], 
-{
-
-
+  "project1",
+  "project2"
+}
 ```
 
+## Trade-offs
+
+``terraform-diff`` relies on git & static analysis of the Terraform files. It will **not** detect, among others:
+ * changes in external datasources
+ * remote states updates
