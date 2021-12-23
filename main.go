@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 )
 
 type cfg struct {
@@ -29,6 +30,10 @@ func getTerraformDependencies(folder string) (map[string]*tfconfig.Module, error
 
 	for _, res := range module.ModuleCalls {
 		expandedModulePath := path.Clean(folder + "/" + res.Source)
+		// pick only modules with source in local paths
+		if !tfconfig.IsModuleDir(res.Source) {
+			continue
+		}
 
 		deps, err := getTerraformDependencies(expandedModulePath)
 		if err != nil {
