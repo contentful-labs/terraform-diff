@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -100,5 +103,29 @@ func TestGetFoldersToPlan(t *testing.T) {
 				t.Errorf("failed test %d, got %+v, wanted %+v", testI, toPlan, testCase.want)
 			}
 		}
+	}
+}
+
+func TestGetTerraformDependencies(t *testing.T) {
+	wd, _ := os.Getwd()
+	path := fmt.Sprintf("%s/%s", wd, "./fixtures")
+	got, _ := getTerraformDependencies(path)
+
+	want := "fixtures/module"
+	doNotWant := "github.com/something/module"
+
+	found := false
+
+	for key, _ := range got {
+		if strings.Contains(key, doNotWant) {
+			t.Errorf("Found unwanted remote module name %s", doNotWant)
+		}
+		if strings.Contains(key, want) {
+			found = true
+		}
+	}
+
+	if found == false {
+		t.Errorf("Did not find local module name %s", want)
 	}
 }
