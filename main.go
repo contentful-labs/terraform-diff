@@ -31,7 +31,7 @@ func getTerraformDependencies(folder string) (map[string]*tfconfig.Module, error
 	for _, res := range module.ModuleCalls {
 		expandedModulePath := path.Clean(folder + "/" + res.Source)
 		// pick only modules with source in local paths
-		if !tfconfig.IsModuleDir(res.Source) {
+		if !tfconfig.IsModuleDir(expandedModulePath) {
 			continue
 		}
 
