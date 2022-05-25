@@ -12,9 +12,10 @@ type Module struct {
 	RequiredCore      []string                        `json:"required_core,omitempty"`
 	RequiredProviders map[string]*ProviderRequirement `json:"required_providers"`
 
-	ManagedResources map[string]*Resource   `json:"managed_resources"`
-	DataResources    map[string]*Resource   `json:"data_resources"`
-	ModuleCalls      map[string]*ModuleCall `json:"module_calls"`
+	ProviderConfigs  map[string]*ProviderConfig `json:"provider_configs,omitempty"`
+	ManagedResources map[string]*Resource       `json:"managed_resources"`
+	DataResources    map[string]*Resource       `json:"data_resources"`
+	ModuleCalls      map[string]*ModuleCall     `json:"module_calls"`
 
 	// Diagnostics records any errors and warnings that were detected during
 	// loading, primarily for inclusion in serialized forms of the module
@@ -22,12 +23,20 @@ type Module struct {
 	Diagnostics Diagnostics `json:"diagnostics,omitempty"`
 }
 
-func newModule(path string) *Module {
+// ProviderConfig represents a provider block in the configuration
+type ProviderConfig struct {
+	Name  string `json:"name"`
+	Alias string `json:"alias,omitempty"`
+}
+
+// NewModule creates new Module representing Terraform module at the given path
+func NewModule(path string) *Module {
 	return &Module{
 		Path:              path,
 		Variables:         make(map[string]*Variable),
 		Outputs:           make(map[string]*Output),
 		RequiredProviders: make(map[string]*ProviderRequirement),
+		ProviderConfigs:   make(map[string]*ProviderConfig),
 		ManagedResources:  make(map[string]*Resource),
 		DataResources:     make(map[string]*Resource),
 		ModuleCalls:       make(map[string]*ModuleCall),
