@@ -2,4 +2,13 @@ module github.com/contentful-labs/terraform-diff
 
 go 1.12
 
-require github.com/hashicorp/terraform-config-inspect v0.0.0-20211115214459-90acf1ca460f
+require (
+	github.com/agext/levenshtein v1.2.3 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.17.0 // indirect
+	github.com/hashicorp/terraform-config-inspect v0.0.0-20230614215431-f32df32a01cd
+	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
+	github.com/zclconf/go-cty v1.13.2 // indirect
+	golang.org/x/text v0.10.0 // indirect
+)

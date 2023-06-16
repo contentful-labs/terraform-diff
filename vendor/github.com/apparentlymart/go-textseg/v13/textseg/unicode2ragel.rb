@@ -79,10 +79,10 @@ end
 # range and description.
 
 def each_alpha( url, property ) 
-  open( url ) do |file|
+  URI.open( url ) do |file|
     file.each_line do |line|
       next if line =~ /^#/;
-      next if line !~ /; #{property} #/;
+      next if line !~ /; #{property} *#/;
 
       range, description = line.split(/;/)
       range.strip!

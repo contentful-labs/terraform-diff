@@ -1,9 +1,12 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 package json
 
 import (
 	"fmt"
 
-	"github.com/apparentlymart/go-textseg/textseg"
+	"github.com/apparentlymart/go-textseg/v13/textseg"
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -107,6 +110,15 @@ func scan(buf []byte, start pos) []token {
 			})
 			// If we've encountered an invalid then we might as well stop
 			// scanning since the parser won't proceed beyond this point.
+			// We insert a synthetic EOF marker here to match the expectations
+			// of consumers of this data structure.
+			p.Pos.Column++
+			p.Pos.Byte++
+			tokens = append(tokens, token{
+				Type:  tokenEOF,
+				Bytes: nil,
+				Range: posRange(p, p),
+			})
 			return tokens
 		}
 	}
