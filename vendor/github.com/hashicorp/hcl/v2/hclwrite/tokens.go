@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/apparentlymart/go-textseg/v13/textseg"
+	"github.com/apparentlymart/go-textseg/v15/textseg"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 )
@@ -48,6 +48,7 @@ type Tokens []*Token
 
 func (ts Tokens) Bytes() []byte {
 	buf := &bytes.Buffer{}
+	//nolint:errcheck // FIXME: Propogate errors upward.
 	ts.WriteTo(buf)
 	return buf.Bytes()
 }
