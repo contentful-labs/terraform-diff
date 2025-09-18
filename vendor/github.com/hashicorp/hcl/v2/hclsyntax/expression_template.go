@@ -94,7 +94,16 @@ func (e *TemplateExpr) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) 
 		ret = cty.UnknownVal(cty.String)
 		if !diags.HasErrors() { // Invalid input means our partial result buffer is suspect
 			if knownPrefix := buf.String(); knownPrefix != "" {
-				ret = ret.Refine().StringPrefix(knownPrefix).NewValue()
+				byteLen := len(knownPrefix)
+				// Impose a reasonable upper limit to avoid producing too long a prefix.
+				// The 128 B is about 10% of the safety limits in cty's msgpack decoder.
+				// @see https://github.com/zclconf/go-cty/blob/v1.13.2/cty/msgpack/unknown.go#L170-L175
+				//
+				// This operation is safe because StringPrefix removes incomplete trailing grapheme clusters.
+				if byteLen > 128 { // arbitrarily-decided threshold
+					byteLen = 128
+				}
+				ret = ret.Refine().StringPrefix(knownPrefix[:byteLen]).NewValue()
 			}
 		}
 	} else {
@@ -175,11 +184,9 @@ func (e *TemplateJoinExpr) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnosti
 
 		if val.IsNull() {
 			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
-				Summary:  "Invalid template interpolation value",
-				Detail: fmt.Sprintf(
-					"An iteration result is null. Cannot include a null value in a string template.",
-				),
+				Severity:    hcl.DiagError,
+				Summary:     "Invalid template interpolation value",
+				Detail:      "An iteration result is null. Cannot include a null value in a string template.",
 				Subject:     e.Range().Ptr(),
 				Expression:  e,
 				EvalContext: ctx,

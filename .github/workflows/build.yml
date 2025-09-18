@@ -17,7 +17,7 @@ jobs:
         run: make docker-test
 
       - name: build
-        run: make docker-image
+        run: docker build -t ${{ github.repository }}:latest .
 
       - name: Log in to GHCR
         run: |
