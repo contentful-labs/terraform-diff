@@ -15,4 +15,4 @@ docker-build:
 	docker run -t -v $$PWD:/go/src/github.com/contentful-labs/terraform-diff -w /go/src/github.com/contentful-labs/terraform-diff golang:1.24 make build
 
 docker-image:
-	docker build -t contentful-labs/terraform-diff:latest .
+	docker buildx build --platform linux/amd64,linux/arm64 -t contentful-labs/terraform-diff:latest .
